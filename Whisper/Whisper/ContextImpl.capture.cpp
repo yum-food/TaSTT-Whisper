@@ -53,6 +53,7 @@ namespace
 	struct CaptureParams
 	{
 		uint32_t minDuration, maxDuration, dropStartSilence, pauseDuration;
+		uint32_t retainDuration;
 		uint32_t flags;
 
 		CaptureParams( const sCaptureParams& cp )
@@ -63,6 +64,8 @@ namespace
 			floats = _mm_round_ps( floats, _MM_FROUND_NINT );
 			__m128i ints = _mm_cvtps_epi32( floats );
 			store16( &minDuration, ints );
+
+			retainDuration = std::round(retainDuration * SAMPLE_RATE);
 
 			flags = cp.flags;
 		}
@@ -142,7 +145,7 @@ namespace
 			buffer.pcm.normalize();
 			SubmitThreadpoolWork( work );
 			pcmStartTime = nextSampleTime;
-			pcm.clear();
+			pcm.retainLast(captureParams.retainDuration);
 			vad.clear();
 			return S_OK;
 		}

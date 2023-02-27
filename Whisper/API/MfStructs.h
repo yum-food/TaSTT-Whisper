@@ -28,6 +28,9 @@ namespace Whisper
 		float maxDuration = 3.0f;
 		float dropStartSilence = 0.25f;
 		float pauseDuration = 0.333f;
+		// After audio is segmented using VAD, as many as this many seconds of
+		// audio will be retained as the input to the next transcription window.
+		float retainDuration = 0.25f;
 		// Flags for the audio capture
 		uint32_t flags = 0;
 	};

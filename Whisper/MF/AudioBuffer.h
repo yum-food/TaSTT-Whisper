@@ -48,9 +48,24 @@ namespace Whisper
 		void dropFirst(size_t len)
 		{
 			assert(len <= mono.size());
+			if (len >= mono.size()) {
+				mono.clear();
+				return;
+			}
 			size_t remainder = mono.size() - len;
 			auto tmp = std::vector<float>(remainder);
 			memcpy(tmp.data(), mono.data() + len, remainder);
+			mono = std::move(tmp);
+		}
+
+		void retainLast(size_t len)
+		{
+			if (len >= mono.size()) {
+				return;
+			}
+			size_t prefix_len = mono.size() - len;
+			auto tmp = std::vector<float>(len);
+			memcpy(tmp.data(), mono.data() + prefix_len, len);
 			mono = std::move(tmp);
 		}
 
