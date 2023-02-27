@@ -1,4 +1,5 @@
 #pragma once
+#include <algorithm>
 #include <vector>
 
 namespace Whisper
@@ -51,6 +52,18 @@ namespace Whisper
 			auto tmp = std::vector<float>(remainder);
 			memcpy(tmp.data(), mono.data() + len, remainder);
 			mono = std::move(tmp);
+		}
+
+		void normalize()
+		{
+			const auto &min = *std::min_element(mono.begin(), mono.end());
+			const auto &max = *std::max_element(mono.begin(), mono.end());
+
+			for (auto& elm : mono) {
+				elm -= min;
+				elm /= (max - min) + 1;
+				elm *= 255.0;
+			}
 		}
 	};
 }

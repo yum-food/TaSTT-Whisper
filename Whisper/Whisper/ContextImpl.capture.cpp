@@ -138,7 +138,8 @@ namespace
 
 			workStatus = S_FALSE;
 			buffer.currentOffset = pcmStartTime;
-			pcm.swap( buffer.pcm );
+			buffer.pcm = pcm;
+			buffer.pcm.normalize();
 			SubmitThreadpoolWork( work );
 			pcmStartTime = nextSampleTime;
 			pcm.clear();
