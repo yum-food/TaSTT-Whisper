@@ -242,7 +242,7 @@ namespace
 			if( newSamples < captureParams.dropStartSilence )
 				return S_OK;
 
-			pcm.clear();
+			pcm.dropFirst(1024);
 			vad.clear();
 			pcmStartTime = nextSampleTime;
 			return S_OK;

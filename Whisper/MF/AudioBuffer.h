@@ -43,5 +43,14 @@ namespace Whisper
 			if( !stereo.empty() )
 				stereo.resize( len * 2 );
 		}
+
+		void dropFirst(size_t len)
+		{
+			assert(len <= mono.size());
+			size_t remainder = mono.size() - len;
+			auto tmp = std::vector<float>(remainder);
+			memcpy(tmp.data(), mono.data() + len, remainder);
+			mono = std::move(tmp);
+		}
 	};
 }
