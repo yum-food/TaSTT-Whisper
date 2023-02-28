@@ -114,10 +114,10 @@ __m128i ContextImpl::getMemoryUse() const
 	size_t cb = vectorMemoryUse( result_all );
 	for( const auto& r : result_all )
 		cb += r.memoryUsage();
-	cb += vectorMemoryUse( prompt_past );
+	cb += vectorMemoryUse( prompt_past_vec );
 	cb += vectorMemoryUse( energy );
-	cb += vectorMemoryUse( probs );
-	cb += vectorMemoryUse( probs_id );
+	cb += vectorMemoryUse( probs_vec );
+	cb += vectorMemoryUse( probs_id_vec );
 	cb += vectorMemoryUse( results.segments );
 	cb += vectorMemoryUse( results.tokens );
 	cb += spectrogram.memoryUsage();

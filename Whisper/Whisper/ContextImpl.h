@@ -38,7 +38,8 @@ namespace Whisper
 		};
 		std::vector<Segment> result_all;
 
-		std::vector<whisper_token> prompt_past;
+		typedef std::vector<whisper_token> prompt_t;
+		std::vector<prompt_t> prompt_past_vec;
 
 		// [EXPERIMENTAL] token-level timestamps data
 		int64_t t_beg = 0;
@@ -50,15 +51,17 @@ namespace Whisper
 		int32_t exp_n_audio_ctx = 0; // 0 - use default
 
 		HRESULT encode( iSpectrogram& mel, int seek );
-		HRESULT decode( const int* tokens, size_t length, int n_past, int threads );
-		sTokenData sampleBest( const float* probs, bool force_timestamp, bool is_initial );
-		sTokenData sampleBest();
-		sTokenData sampleTimestamp( bool initial );
+		HRESULT decode( const int* tokens, size_t length, int n_past, int threads, int nth );
+		std::vector<sTokenData> sampleBestN( const float* probs, bool force_timestamp, bool is_initial, int nth, int n_best );
+		std::vector<sTokenData> sampleBestN(int nth, int n_best);
+		std::vector<sTokenData> sampleTimestampN( bool initial, int nth, int n_best );
 		int wrapSegment( int max_len );
 		void expComputeTokenLevelTimestamps( int i_segment, float thold_pt, float thold_ptsum );
 
-		std::vector<float> probs;
-		std::vector<std::pair<double, Vocabulary::id>> probs_id;
+		typedef std::vector<float> probs_t;
+		std::vector<probs_t> probs_vec{ 1 };
+		typedef std::vector<std::pair<double, Vocabulary::id>> probs_id_t;
+		std::vector<probs_id_t> probs_id_vec{ 1 };
 
 		mutable TranscribeResultStatic results;
 
