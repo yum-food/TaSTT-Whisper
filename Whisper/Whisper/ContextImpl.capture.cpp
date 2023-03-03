@@ -65,7 +65,7 @@ namespace
 			__m128i ints = _mm_cvtps_epi32( floats );
 			store16( &minDuration, ints );
 
-			retainDuration = std::round(retainDuration * SAMPLE_RATE);
+			retainDuration = (int) (retainDuration * SAMPLE_RATE + 0.5);
 
 			flags = cp.flags;
 		}

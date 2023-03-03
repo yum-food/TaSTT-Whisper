@@ -38,8 +38,22 @@ namespace Whisper
 		};
 		std::vector<Segment> result_all;
 
-		typedef std::vector<whisper_token> prompt_t;
-		std::vector<prompt_t> prompt_past_vec;
+		struct Context {
+			std::vector<whisper_token> prompt_past;
+			std::vector<float> probs;
+			std::vector<std::pair<double, Vocabulary::id>> probs_id;
+			// These are cleared on every frame of audio processed.
+			struct AudioFrameContext {
+				std::vector<whisper_token> prompt;
+				std::vector<sTokenData> tokens_cur;
+				std::vector<float> joint_probs;
+
+				int result_len = 0;
+				int n_past = 0;
+			};
+			AudioFrameContext loop_ctx;
+		};
+		std::vector<Context> ctx_;
 
 		// [EXPERIMENTAL] token-level timestamps data
 		int64_t t_beg = 0;
@@ -57,11 +71,6 @@ namespace Whisper
 		std::vector<sTokenData> sampleTimestampN( bool initial, int nth, int n_best );
 		int wrapSegment( int max_len );
 		void expComputeTokenLevelTimestamps( int i_segment, float thold_pt, float thold_ptsum );
-
-		typedef std::vector<float> probs_t;
-		std::vector<probs_t> probs_vec{ 1 };
-		typedef std::vector<std::pair<double, Vocabulary::id>> probs_id_t;
-		std::vector<probs_id_t> probs_id_vec{ 1 };
 
 		mutable TranscribeResultStatic results;
 
