@@ -47,7 +47,6 @@ namespace Whisper
 
 		void dropFirst(size_t len)
 		{
-			assert(len <= mono.size());
 			if (len >= mono.size()) {
 				mono.clear();
 				return;

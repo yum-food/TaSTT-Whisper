@@ -837,12 +837,10 @@ HRESULT COMLIGHTCALL ContextImpl::runFullImpl( const sFullParams& params, const 
 					// in ascending order, we're always copying from old or
 					// identical data.
 					for (int nth_beam = 0; nth_beam < ctx_.size(); nth_beam++) {
-#if 0
 						// Trivial optimization: only copy if beams differ.
 						if (nth_beam == best_beams_and_tokens[nth_beam].first) {
 							continue;
 						}
-#endif
 						ctx_[nth_beam] = ctx_[best_beams_and_tokens[nth_beam].first];
 					}
 

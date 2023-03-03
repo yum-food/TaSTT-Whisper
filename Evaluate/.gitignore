@@ -1,0 +1,10 @@
+# models
+*.bin
+# audio
+*.mp3
+*.wav
+# reference transcripts
+*.txt
+# binaries
+*.exe
+*.dll
