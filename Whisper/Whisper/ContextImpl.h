@@ -42,16 +42,30 @@ namespace Whisper
 			std::vector<whisper_token> prompt_past;
 			std::vector<float> probs;
 			std::vector<std::pair<double, Vocabulary::id>> probs_id;
+			int seek_delta;
+			bool has_ts;
+			int n_past = 0;
 			// These are cleared on every frame of audio processed.
 			struct AudioFrameContext {
 				std::vector<whisper_token> prompt;
 				std::vector<sTokenData> tokens_cur;
-				std::vector<float> joint_probs;
 
 				int result_len = 0;
-				int n_past = 0;
+			};
+			struct BeamSearchContext {
+				// Each beam picks the N most likely tokens and accumulates
+				// them here.
+				std::vector<sTokenData> best_tokens;
+				// Some beams may finish earlier than others, in which case
+				// we'd like to avoid re-running inference.
+				std::vector<float> probs_prev;
+				// Joint probability of every token leading up to the current
+				// context.
+				float joint_prob;
+				bool beam_done;
 			};
 			AudioFrameContext loop_ctx;
+			BeamSearchContext beam_ctx;
 		};
 		std::vector<Context> ctx_;
 
@@ -71,6 +85,11 @@ namespace Whisper
 		std::vector<sTokenData> sampleTimestampN( bool initial, int nth, int n_best );
 		int wrapSegment( int max_len );
 		void expComputeTokenLevelTimestamps( int i_segment, float thold_pt, float thold_ptsum );
+
+		// Return the (nth beam, nth best) pair with the lowest joint probability.
+		std::pair<int, int> beamGetMinJointProb() const;
+		// Return the (nth beam, nth best) pair with the highest joint probability.
+		int beamGetMaxJointProb() const;
 
 		mutable TranscribeResultStatic results;
 
