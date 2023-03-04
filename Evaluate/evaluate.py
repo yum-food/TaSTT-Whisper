@@ -1,10 +1,11 @@
 import argparse
 import editdistance
-import jiwer
 import re
 import subprocess
 import sys
 import time
+
+from whisper.normalizers import EnglishTextNormalizer
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -33,22 +34,15 @@ if __name__ == "__main__":
     with open(args.reference_path, "r") as f:
         ref_transcript = f.read()
 
+    # Normalize transcripts before computing edit distance (as described in
+    # whisper paper).
+    normalize = EnglishTextNormalizer()
+    test_transcript = normalize(test_transcript)
+    ref_transcript = normalize(ref_transcript)
+
     dist = editdistance.eval(ref_transcript, test_transcript)
-    wer_transform = jiwer.Compose([
-        jiwer.ToLowerCase(),
-        jiwer.RemoveWhiteSpace(replace_by_space=True),
-        jiwer.RemoveMultipleSpaces(),
-        jiwer.RemovePunctuation(),
-        jiwer.ReduceToListOfListOfWords(word_delimiter=" "),
-        ]) 
-    wer = jiwer.wer(
-            ref_transcript,
-            test_transcript,
-            truth_transform=wer_transform,
-            hypothesis_transform=wer_transform)
 
     print(f"Duration: {t1 - t0}")
     print(f"Levenshtein distance: {dist}")
-    print(f"Word error rate: {wer}")
     print(f"Transcript: {test_transcript}")
 

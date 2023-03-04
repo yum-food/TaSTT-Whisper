@@ -59,9 +59,9 @@ namespace Whisper
 				// Some beams may finish earlier than others, in which case
 				// we'd like to avoid re-running inference.
 				std::vector<float> probs_prev;
-				// Joint probability of every token leading up to the current
-				// context.
-				float joint_prob;
+				// Joint log-probability of every token leading up to the
+				// current context.
+				float joint_logprob;
 				bool beam_done;
 			};
 			AudioFrameContext loop_ctx;
