@@ -926,6 +926,11 @@ HRESULT COMLIGHTCALL ContextImpl::runFullImpl( const sFullParams& params, const 
 		for( const auto& r : tokens_cur )
 			prompt_past.push_back( r.id );
 
+		for (int i = 0; i < n_ctxt; i++) {
+			auto& cur_prompt_past = ctx_[best_beam].prompt_past;
+			cur_prompt_past = prompt_past;
+		}
+
 		// store the text from this iteration
 		if( !tokens_cur.empty() )
 		{
