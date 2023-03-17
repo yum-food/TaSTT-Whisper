@@ -44,5 +44,6 @@ if __name__ == "__main__":
 
     print(f"Duration: {t1 - t0}")
     print(f"Levenshtein distance: {dist}")
-    print(f"Transcript: {test_transcript}")
+    print(f"Control: {ref_transcript}")
+    print(f"Experiment: {test_transcript}")
 

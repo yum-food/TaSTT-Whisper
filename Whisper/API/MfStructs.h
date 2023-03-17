@@ -19,6 +19,8 @@ namespace Whisper
 	{
 		// When the capture device supports stereo, keep stereo PCM samples in addition to mono
 		Stereo = 1,
+		// Don't use voice activity detection (VAD).
+		DisableVAD = 2,
 	};
 
 	// Parameters for audio capture

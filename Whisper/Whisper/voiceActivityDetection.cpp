@@ -9,9 +9,12 @@ using namespace Whisper;
 inline VAD::Feature VAD::defaultPrimaryThresholds()
 {
 	Feature f;
+	// Energy primary threshold
 	f.energy = 40;
+	// Frequency primary threshold
 	f.F = 185;
-	f.SFM = 5;
+	// Spectral flatness measure (SFM) primary threshold
+	f.SFM = 1;
 	return f;
 }
 

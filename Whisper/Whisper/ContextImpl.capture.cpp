@@ -238,35 +238,48 @@ namespace
 		CHECK( readSample( false ) );
 		const size_t newSamples = pcm.mono.size();
 
-		const size_t lastVoiceFrame = detectVoice();
-		if( lastVoiceFrame == 0 )
-		{
-			// No voice is detected in the entire buffered audio
-			clearStateFlag( eCaptureStatus::Voice );
-			if( newSamples < captureParams.dropStartSilence )
+		const bool wantVAD = !(captureParams.flags & (uint32_t)eCaptureFlags::DisableVAD);
+		if (wantVAD) {
+			const size_t lastVoiceFrame = detectVoice();
+			if (lastVoiceFrame == 0)
+			{
+				// No voice is detected in the entire buffered audio
+				clearStateFlag(eCaptureStatus::Voice);
+				if (newSamples < captureParams.dropStartSilence)
+					return S_OK;
+
+				pcm.dropFirst(1024);
+				vad.clear();
+				pcmStartTime = nextSampleTime;
 				return S_OK;
+			}
 
-			pcm.dropFirst(1024);
-			vad.clear();
-			pcmStartTime = nextSampleTime;
-			return S_OK;
+			const bool newFrameVoice = lastVoiceFrame + captureParams.pauseDuration >= oldSamples;
+
+			if (newFrameVoice)
+			{
+				// A voice is detected in the buffer, and it was fairly recently
+				setStateFlag(eCaptureStatus::Voice);
+				if (newSamples < captureParams.maxDuration)
+					return S_OK;	// While voice is continuously detected, we allow to grow the buffer up to `maxDuration` time
+			}
+			else
+			{
+				// A voice is detected in the buffer, but it was a while ago
+				clearStateFlag(eCaptureStatus::Voice);
+				if (newSamples < captureParams.minDuration)
+					return S_OK;	// When detected pause in the voice, we fire the transcribe task right away.
+			}
 		}
-
-		const bool newFrameVoice = lastVoiceFrame + captureParams.pauseDuration >= oldSamples;
-
-		if( newFrameVoice )
-		{
-			// A voice is detected in the buffer, and it was fairly recently
-			setStateFlag( eCaptureStatus::Voice );
-			if( newSamples < captureParams.maxDuration )
-				return S_OK;	// While voice is continuously detected, we allow to grow the buffer up to `maxDuration` time
-		}
-		else
-		{
-			// A voice is detected in the buffer, but it was a while ago
-			clearStateFlag( eCaptureStatus::Voice );
-			if( newSamples < captureParams.minDuration )
-				return S_OK;	// When detected pause in the voice, we fire the transcribe task right away.
+		else {
+			// VAD is disabled. Pause until minimum duration is reached.
+			if (pcm.mono.size() < captureParams.minDuration) {
+				return S_OK;
+			}
+			// Ensure buffer is not too long.
+			if (pcm.mono.size() >= captureParams.maxDuration) {
+				pcm.retainLast(captureParams.maxDuration);
+			}
 		}
 
 		// Hopefully, we have enough captured PCM data to run the ASR model.
