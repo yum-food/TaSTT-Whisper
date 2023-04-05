@@ -142,7 +142,21 @@ namespace
 			workStatus = S_FALSE;
 			buffer.currentOffset = pcmStartTime;
 			buffer.pcm = pcm;
+#if 0
+			{
+				static int i = 0;
+				std::string filename = "buf_" + std::to_string(i++) + "_raw.wav";
+				buffer.pcm.save(filename.c_str(), SAMPLE_RATE / 2);
+			}
+#endif
 			buffer.pcm.normalize();
+#if 0
+			{
+				static int i = 0;
+				std::string filename = "buf_" + std::to_string(i++) + "_normalized.wav";
+				buffer.pcm.save(filename.c_str(), SAMPLE_RATE / 2);
+			}
+#endif
 			SubmitThreadpoolWork( work );
 			pcmStartTime = nextSampleTime;
 			pcm.retainLast(captureParams.retainDuration);
